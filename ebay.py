@@ -14,21 +14,18 @@ class EbayScraper:
         self.offer_type = offer_type.lower()
         self.output_file = output_file or "output_ebay.txt"
 
-        # Normalize offer_type to API format
         if self.offer_type == 'a':
             self.offer_type = "AUCTION"
         else:
             self.offer_type = "FIXED_PRICE"
 
-        # Trigger token check only on first lightweight instantiation
         if pre_auth_check:
             self.access_token = self.load_access_token()
         else:
-            self.access_token = None  # Delayed loading
+            self.access_token = None
 
     def authentication(self, file_path="tokens.json"):
         import base64
-        # HARDCODED EBAY API CREDENTIALS (used if env vars are not set)
         client_id = os.environ.get("PROD_EBAY_APP_ID")
         client_secret = os.environ.get("PROD_EBAY_CERT_ID")
         redirect_uri = os.environ.get("PROD_EBAY_RUNAME")
@@ -157,7 +154,6 @@ class EbayScraper:
                 item_data["bid_ends_in"] = str(until_end)[:-7]
             results.append(item_data)
 
-        # Compose lines for output file
         lines = []
         for item in results:
             if self.offer_type == "FIXED_PRICE":
@@ -174,7 +170,6 @@ class EbayScraper:
             line = f"{price_str} | {item['title']} | {item['url']}"
             lines.append(line)
 
-        # Save to output file
         output_dir = os.path.join("Output", "EBAY")
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, self.output_file)
